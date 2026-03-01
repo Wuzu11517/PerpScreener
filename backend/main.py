@@ -26,6 +26,8 @@ from adapters import ADAPTERS
 from coingecko import fetch_market_data
 from filters import apply_filters
 
+from starlette.middleware.cors import CORSMiddleware
+
 load_dotenv()   
 
 @asynccontextmanager
@@ -34,11 +36,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Perp Screener API", lifespan=lifespan)
 
-# Allow the React frontend to call this API.
-# In production, replace "*" with your Vercel domain.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://perp-screener-tan.vercel.app"],
+    allow_origins=[
+        "https://perp-screener-tan.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_origin_regex=r"https://perp-screener-.*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )
