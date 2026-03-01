@@ -26,7 +26,7 @@ from adapters import ADAPTERS
 from coingecko import fetch_market_data
 from filters import apply_filters
 
-load_dotenv()
+load_dotenv()   
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,7 +38,7 @@ app = FastAPI(title="Perp Screener API", lifespan=lifespan)
 # In production, replace "*" with your Vercel domain.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://perp-screener-tan.vercel.app/"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
