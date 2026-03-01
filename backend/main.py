@@ -38,7 +38,7 @@ app = FastAPI(title="Perp Screener API", lifespan=lifespan)
 # In production, replace "*" with your Vercel domain.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://perp-screener-tan.vercel.app/"],
+    allow_origins=["https://perp-screener-tan.vercel.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
