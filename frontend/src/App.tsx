@@ -4,7 +4,7 @@ import { ResultsTable } from "./components/ResultsTable";
 import { fetchPlatforms, fetchFilteredTokens } from "./api";
 import { exportToCSV } from "./utils/exportCSV";
 import { FilterState, FilterResponse } from "./types";
-import { Download, Search, ChevronDown } from "lucide-react";
+import { Download, Search, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import "./App.css";
 
 export default function App() {
@@ -14,6 +14,7 @@ export default function App() {
   const [response, setResponse] = useState<FilterResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     fetchPlatforms()
@@ -29,7 +30,6 @@ export default function App() {
     setError(null);
     setResponse(null);
 
-    // Build the filters payload — only include enabled filters with a value
     const activeFilters: Record<string, { condition: string; value: number }> = {};
     for (const [key, state] of Object.entries(filters)) {
       if (state.enabled && state.rule.value !== "") {
@@ -56,6 +56,13 @@ export default function App() {
       <header className="header">
         <div className="header__inner">
           <div className="header__brand">
+            <button
+              className="sidebar-toggle"
+              onClick={() => setSidebarOpen((o) => !o)}
+              title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              {sidebarOpen ? <PanelLeftClose size={17} /> : <PanelLeftOpen size={17} />}
+            </button>
             <span className="header__logo">◈</span>
             <span className="header__title">Perp Screener</span>
           </div>
@@ -70,40 +77,39 @@ export default function App() {
 
       <main className="main">
         {/* Sidebar */}
-        <aside className="sidebar">
-          {/* Platform selector */}
-          <div className="sidebar__section">
-            <label className="sidebar__label">Platform</label>
-            <div className="select-wrapper">
-              <select
-                className="platform-select"
-                value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
-              >
-                {platforms.map((p) => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-              <ChevronDown size={14} className="select-icon" />
+        <aside className={`sidebar ${sidebarOpen ? "" : "sidebar--collapsed"}`}>
+          <div className="sidebar__content">
+            <div className="sidebar__section">
+              <label className="sidebar__label">Platform</label>
+              <div className="select-wrapper">
+                <select
+                  className="platform-select"
+                  value={platform}
+                  onChange={(e) => setPlatform(e.target.value)}
+                >
+                  {platforms.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="select-icon" />
+              </div>
             </div>
+
+            <div className="sidebar__section">
+              <FilterPanel filters={filters} onChange={setFilters} />
+            </div>
+
+            <button
+              className="run-btn"
+              onClick={handleRun}
+              disabled={loading || !platform}
+            >
+              <Search size={15} />
+              {loading ? "Scanning..." : "Run Screener"}
+            </button>
+
+            {error && <p className="error-msg">{error}</p>}
           </div>
-
-          {/* Filters */}
-          <div className="sidebar__section">
-            <FilterPanel filters={filters} onChange={setFilters} />
-          </div>
-
-          {/* Run button */}
-          <button
-            className="run-btn"
-            onClick={handleRun}
-            disabled={loading || !platform}
-          >
-            <Search size={15} />
-            {loading ? "Scanning..." : "Run Screener"}
-          </button>
-
-          {error && <p className="error-msg">{error}</p>}
         </aside>
 
         {/* Results area */}

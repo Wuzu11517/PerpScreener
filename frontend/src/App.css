@@ -111,6 +111,25 @@ body {
   overflow: hidden;
 }
 
+/* ── Sidebar toggle button ───────────────────────────────────── */
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius);
+  transition: color 0.15s, background 0.15s;
+}
+
+.sidebar-toggle:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
 /* ── Sidebar ─────────────────────────────────────────────────── */
 .sidebar {
   width: 280px;
@@ -119,9 +138,29 @@ body {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 0;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+
+.sidebar--collapsed {
+  width: 0;
+  border-right: none;
+}
+
+.sidebar__content {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   padding-bottom: 24px;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar--collapsed .sidebar__content {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebar__section {
