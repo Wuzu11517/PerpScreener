@@ -43,8 +43,6 @@ def _passes_all(row: dict, filters: dict) -> bool:
 
         row_value = row.get(field)
 
-        # If the token is missing this data point, exclude it when a filter
-        # is active — we can't confirm it passes
         if row_value is None:
             return False
 
