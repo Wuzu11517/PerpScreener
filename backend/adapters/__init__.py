@@ -10,14 +10,12 @@ That's it. The API and frontend pick it up automatically.
 """
 
 from adapters.blofin import fetch_instruments as blofin_fetch
-from adapters.bybit import fetch_instruments as bybit_fetch
 from adapters.okx import fetch_instruments as okx_fetch
 from adapters.mexc import fetch_instruments as mexc_fetch
 
 # Keys here become the options in the frontend platform dropdown
 ADAPTERS: dict[str, callable] = {
     "BloFin": blofin_fetch,
-    "Bybit":  bybit_fetch,
     "OKX":    okx_fetch,
     "MEXC":   mexc_fetch,
 }
