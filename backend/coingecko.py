@@ -105,3 +105,49 @@ def _batch(items: list, size: int):
     """Split a list into chunks of at most `size` items."""
     for i in range(0, len(items), size):
         yield items[i : i + size]
+
+
+async def fetch_coin_id(symbol: str) -> str | None:
+    """
+    Look up the CoinGecko coin ID for a given symbol.
+    Returns None if not found or ambiguous.
+    """
+    url = f"{COINGECKO_BASE}/coins/markets"
+    params = {
+        "vs_currency": "usd",
+        "symbols": symbol.lower(),
+        "include_tokens": "all",
+        "per_page": 10,
+        "page": 1,
+    }
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        response = await client.get(url, headers=_headers(), params=params)
+        response.raise_for_status()
+        rows = response.json()
+
+    # Filter to only rows matching our symbol exactly
+    matches = [r for r in rows if r.get("symbol", "").upper() == symbol.upper()]
+    if len(matches) == 1:
+        return matches[0]["id"]
+    return None
+
+
+async def fetch_ohlc(coin_id: str, days: int) -> list[dict]:
+    """
+    Fetch OHLC candlestick data for a coin.
+    Returns list of {time, open, high, low, close}.
+    """
+    url = f"{COINGECKO_BASE}/coins/{coin_id}/ohlc"
+    params = {"vs_currency": "usd", "days": days}
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        response = await client.get(url, headers=_headers(), params=params)
+        response.raise_for_status()
+        raw = response.json()
+
+    # CoinGecko returns [[timestamp_ms, open, high, low, close], ...]
+    return [
+        {"time": int(row[0] / 1000), "open": row[1], "high": row[2], "low": row[3], "close": row[4]}
+        for row in raw
+    ]
