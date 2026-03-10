@@ -1,7 +1,8 @@
 import { FilterRequest, FilterResponse } from "./types";
 
-// Falls back to localhost in development — set REACT_APP_API_URL in .env for production
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// Falls back to localhost in development — set VITE_API_URL in .env for production
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const BASE = API_URL;
 
 export async function fetchPlatforms(): Promise<string[]> {
   const res = await fetch(`${BASE}/api/platforms`);
