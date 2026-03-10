@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { TokenResult } from "../types";
 import { COLUMNS } from "../columns";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { ChartModal } from "./ChartModal";
 
 interface Props {
   results: TokenResult[];
@@ -12,6 +13,7 @@ type SortDir = "asc" | "desc" | null;
 export function ResultsTable({ results }: Props) {
   const [sortKey, setSortKey] = useState<keyof TokenResult | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
 
   // Cycle sort: none → desc → asc → none
   const handleSort = (key: keyof TokenResult) => {
@@ -57,46 +59,58 @@ export function ResultsTable({ results }: Props) {
   }
 
   return (
-    <div className="table-wrapper">
-      <table className="results-table">
-        <thead>
-          <tr>
-            {COLUMNS.map((col) => (
-              <th
-                key={col.key}
-                className="table-th"
-                onClick={() => handleSort(col.key)}
-              >
-                <span className="th-inner">
-                  {col.label}
-                  <SortIcon col={col.key} />
-                </span>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((row, i) => (
-            <tr key={row.symbol + i} className="table-row">
-              {COLUMNS.map((col) => {
-                const raw = row[col.key] as number | null;
-                return (
-                  <td
-                    key={col.key}
-                    className={`table-td ${changeClass(col.key, raw)}`}
-                  >
-                    {col.key === "symbol" ? (
-                      <span className="symbol-cell">{row.symbol}</span>
-                    ) : (
-                      col.format(raw)
-                    )}
-                  </td>
-                );
-              })}
+    <>
+      {selectedSymbol && (
+        <ChartModal
+          symbol={selectedSymbol}
+          onClose={() => setSelectedSymbol(null)}
+        />
+      )}
+      <div className="table-wrapper">
+        <table className="results-table">
+          <thead>
+            <tr>
+              {COLUMNS.map((col) => (
+                <th
+                  key={col.key}
+                  className="table-th"
+                  onClick={() => handleSort(col.key)}
+                >
+                  <span className="th-inner">
+                    {col.label}
+                    <SortIcon col={col.key} />
+                  </span>
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {sorted.map((row, i) => (
+              <tr
+                key={row.symbol + i}
+                className="table-row table-row--clickable"
+                onClick={() => setSelectedSymbol(row.symbol)}
+              >
+                {COLUMNS.map((col) => {
+                  const raw = row[col.key] as number | null;
+                  return (
+                    <td
+                      key={col.key}
+                      className={`table-td ${changeClass(col.key, raw)}`}
+                    >
+                      {col.key === "symbol" ? (
+                        <span className="symbol-cell">{row.symbol}</span>
+                      ) : (
+                        col.format(raw)
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
