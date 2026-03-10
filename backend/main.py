@@ -23,7 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from adapters import ADAPTERS
-from coingecko import fetch_market_data
+from coingecko import fetch_market_data, fetch_coin_id, fetch_ohlc
 from filters import apply_filters
 
 from starlette.middleware.cors import CORSMiddleware
@@ -61,6 +61,19 @@ class FilterRequest(BaseModel):
 async def get_platforms():
     """Return the list of supported platforms for the frontend dropdown."""
     return {"platforms": list(ADAPTERS.keys())}
+
+@app.get("/api/chart/{symbol}")
+async def get_chart(symbol: str, days: int = 7):
+    """
+    Return OHLC candlestick data for a given symbol.
+    days param controls the time range (1, 7, 30, 90).
+    """
+    coin_id = await fetch_coin_id(symbol.upper())
+    if coin_id is None:
+        raise HTTPException(status_code=404, detail=f"No CoinGecko coin found for symbol '{symbol}'")
+
+    ohlc = await fetch_ohlc(coin_id, days)
+    return {"symbol": symbol.upper(), "days": days, "ohlc": ohlc}
 
 
 @app.post("/api/filter")
