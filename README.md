@@ -2,6 +2,15 @@
 
 Screen perpetual futures tokens across exchanges, cross-referenced with CoinGecko market data, with toggleable filters.
 
+## Demo
+
+### Landing Page
+![Landing Page](assets/landing-page.png)
+
+### Search Results
+![Search Results](assets/search-result.png)
+
+
 ```
 perp-screener/
 ├── backend/       FastAPI app (containerized, deploy to Render)
